@@ -1,0 +1,108 @@
+import React from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Alert,
+} from 'react-native';
+
+interface UpdateExcludeButtonsProps {
+  habitInput: string;
+  handleUpdate: () => void;
+  habitArea: string;
+}
+
+const UpdateExcludeButtons: React.FC<UpdateExcludeButtonsProps> = () => {
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.updateButton}
+        activeOpacity={0.8}
+        onPress={() => {
+          Alert.alert(
+            'Ao prosseguir você vai atualizar o hábito, tem certeza?',
+            'Ao fazer isso você pode mudar o hábito, frequência e notificação.',
+            [
+              {
+                text: 'Cancelar',
+              },
+              {
+                text: 'Atualizar',
+                onPress: () => {},
+              },
+            ],
+          );
+        }}>
+        <Text style={styles.updateButtonText}>Atualizar</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.trashButton}
+        activeOpacity={0.8}
+        onPress={() => {
+          Alert.alert(
+            `Você tem certeza que quer excluir o hábito?`,
+            'Ao fazer isso perderá todo o progresso ou falha do hábito.',
+            [
+              {
+                text: 'Cancelar',
+                onPress: () => {
+                  Alert.alert('Exclusão cancelada com sucesso!');
+                },
+              },
+              {
+                text: 'Excluir',
+                onPress: () => {},
+              },
+            ],
+          );
+        }}>
+        <Image
+          source={require('../../../assets/icons/trash.png')}
+          style={styles.trashIcon}
+        />
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    marginBottom: 20,
+  },
+
+  updateButton: {
+    borderWidth: 1,
+    borderColor: 'white',
+    width: 150,
+    height: 50,
+    marginRight: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+  },
+
+  updateButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+
+  trashButton: {
+    borderWidth: 1,
+    borderColor: '#FF0044',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 90,
+  },
+
+  trashIcon: {
+    width: 25,
+    height: 25,
+  },
+});
+
+export default UpdateExcludeButtons;
