@@ -6,7 +6,7 @@ export default function react() {
     <View style={styles.container}>
       <Text style={styles.title}>
         Através deste APP você vai consolidar {'\n'} 4 hábitos de áreas
-        fundamentais:
+        fundamentais para melhorar a sua qualidade de vida:
       </Text>
       <View style={styles.explanationContainer}>
         <Image
@@ -58,7 +58,7 @@ export default function react() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#151515',
+    backgroundColor: '#252525',
     width: 350,
     borderRadius: 25,
     padding: 30,

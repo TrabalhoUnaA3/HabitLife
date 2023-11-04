@@ -4,7 +4,7 @@ import {SelectList} from 'react-native-dropdown-select-list';
 
 interface FrequencyProps {
   habitFrequency: string | undefined;
-  frequencyInput: (frequency: string | undefined) => void;
+  frequencyInput: any;
 }
 
 export default function SelectFrequency({

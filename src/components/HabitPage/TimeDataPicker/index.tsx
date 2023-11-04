@@ -7,7 +7,9 @@ import {
   Image,
 } from 'react-native';
 import {SelectList} from 'react-native-dropdown-select-list';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from '@react-native-community/datetimepicker';
 import {Text} from 'react-native-paper';
 
 interface TimeDataPickerProps {
@@ -30,18 +32,11 @@ export default function TimeDataPicker({
   const [show, setShow] = useState(false);
   const [selected, setSelected] = useState('-');
 
-  const [notificationDate, setNotificationDate] = useState<
-    string | undefined
-  >();
-  const [notificationTime, setNotificationTime] = useState<
-    string | undefined
-  >();
+  const [notificationDate, setNotificationDate] = useState('');
+  const [notificationTime, setNotificationTime] = useState('');
 
   const onChange = (
-    _?:
-      | Event
-      | React.ChangeEvent<HTMLElement>
-      | React.ChangeEvent<HTMLInputElement>,
+    _?: DateTimePickerEvent,
     selectedDate?: Date | undefined,
   ) => {
     const currentDate = selectedDate || date;
@@ -53,7 +48,7 @@ export default function TimeDataPicker({
     const notficationHour = tempDate.getHours().toString().padStart(2, '0');
     const notficationMin = tempDate.getMinutes().toString().padStart(2, '0');
 
-    let dateNotification;
+    let dateNotification = '';
 
     if (frequency === 'Semanal') {
       dateNotification = selected;
@@ -67,7 +62,7 @@ export default function TimeDataPicker({
     if (frequency === 'Diário') {
       setDayNotification('Diário');
     } else {
-      setDayNotification(dateNotification || '');
+      setDayNotification(dateNotification);
     }
     setTimeNotification(timeNotification);
   };
@@ -146,7 +141,7 @@ export default function TimeDataPicker({
           mode={mode}
           is24Hour={true}
           display="default"
-          onChange={() => {}}
+          onChange={onChange}
         />
       )}
     </View>

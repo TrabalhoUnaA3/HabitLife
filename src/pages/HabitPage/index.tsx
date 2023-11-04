@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -23,141 +24,12 @@ import DefaultButton from '../../../src/components/common/DefaultButton';
 // });
 
 export default function HabitPage() {
-  // const navigation = useNavigation();
-  // const [habitInput, setHabitInput] = useState();
+  const [frequencyInput, setFrequencyInput] = useState('Diário');
+  const [notificationToggle, setNotificationToggle] = useState(false);
+  const [dayNotification, setDayNotification] = useState('');
+  const [timeNotification, setTimeNotification] = useState('');
 
-  // const [frequencyInput, setFrequencyInput] = useState();
-  // const [notificationToggle, setNotificationToggle] = useState();
-  // const [dayNotification, setDayNotification] = useState();
-  // const [timeNotification, setTimeNotification] = useState();
-
-  // const {create, habit} = route.params;
-
-  // const habitCreated = new Date();
-  // const formatDate = `${habitCreated.getFullYear()}-${habitCreated.getMonth()}-${habitCreated.getDate()}`;
-
-  // const [notification, setNotification] = useState(false);
-  // const notificationListener = useRef();
-  // const responseListener = useRef();
-
-  // function handleCreateHabit() {
-  //   if (habitInput === undefined || frequencyInput === undefined) {
-  //     Alert.alert(
-  //       'Você precisa selecionar um hábito e frequência para continuar',
-  //     );
-  //   } else if (
-  //     notificationToggle === true &&
-  //     frequencyInput === 'Diário' &&
-  //     timeNotification === undefined
-  //   ) {
-  //     Alert.alert('Você precisa dizer o horário da notificação!');
-  //   } else if (
-  //     notificationToggle === true &&
-  //     frequencyInput === 'Diário' &&
-  //     dayNotification === undefined &&
-  //     timeNotification === undefined
-  //   ) {
-  //     Alert.alert(
-  //       'Você precisa dizer a frequência e o horário da notificação!',
-  //     );
-  //   } else {
-  //     if (notificationToggle) {
-  //       NotificationService.createNotification(
-  //         habitInput,
-  //         frequencyInput,
-  //         dayNotification,
-  //         timeNotification,
-  //       );
-  //     }
-
-  //     HabitsService.createHabit({
-  //       habitArea: habit?.habitArea,
-  //       habitName: habitInput,
-  //       habitFrequency: frequencyInput,
-  //       habitHasNotification: notificationToggle,
-  //       habitNotificationFrequency: dayNotification,
-  //       habitNotificationTime: timeNotification,
-  //       lastCheck: formatDate,
-  //       daysWithoutChecks: 0,
-  //       habitIsChecked: 0,
-  //       progressBar: 1,
-  //       habitChecks: 0,
-  //     }).then(() => {
-  //       Alert.alert('Sucesso na criação do hábito!');
-
-  //       navigation.navigate('Home', {
-  //         createdHabit: `Created in ${habit?.habitArea}`,
-  //       });
-  //     });
-  //   }
-  // }
-
-  // function handleUpdateHabit() {
-  //   if (notificationToggle === true && !dayNotification && !timeNotification) {
-  //     Alert.alert('Você precisa colocar a frequência e horário da notificação');
-  //   } else {
-  //     HabitsService.updateHabit({
-  //       habitArea: habit?.habitArea,
-  //       habitName: habitInput,
-  //       habitFrequency: frequencyInput,
-  //       habitHasNotification: notificationToggle,
-  //       habitNotificationFrequency: dayNotification,
-  //       habitNotificationTime: timeNotification,
-  //       habitNotificationId: notificationToggle ? habitInput : null,
-  //     }).then(() => {
-  //       Alert.alert('Sucesso na atualização do hábito');
-  //       if (!notificationToggle) {
-  //         NotificationService.deleteNotification(habit?.habitName);
-  //       } else {
-  //         NotificationService.deleteNotification(habit?.habitName);
-  //         NotificationService.createNotification(
-  //           habitInput,
-  //           frequencyInput,
-  //           dayNotification,
-  //           timeNotification,
-  //         );
-  //       }
-  //     });
-  //     navigation.navigate('Home', {
-  //       updatedHabit: `Updated in ${habit?.habitArea}`,
-  //     });
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   if (habit?.habitHasNotification == 1) {
-  //     setNotificationToggle(true);
-  //     setDayNotification(habit?.habitNotificationFrequency);
-  //     setTimeNotification(habit.habitNotificationTime);
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   if (notificationToggle === false) {
-  //     setTimeNotification(null);
-  //     setDayNotification(null);
-  //   }
-  // }, [notificationToggle]);
-
-  // useEffect(() => {
-  //   notificationListener.current =
-  //     Notifications.addNotificationReceivedListener(notification => {
-  //       setNotification(notification);
-  //     });
-  //   responseListener.current =
-  //     Notifications.addNotificationResponseReceivedListener(response => {
-  //       console.log(response);
-  //     });
-  //   return () => {
-  //     Notifications.removeNotificationSubscription(
-  //       notificationListener.current,
-  //     );
-  //     Notifications.removeNotificationSubscription(responseListener.current);
-  //   };
-  // }, []);
-  var frequencyInput = 'Diário';
-  var notificationToggle = true;
-  var create = false;
+  var create = true;
 
   return (
     <View style={styles.container}>
@@ -180,12 +52,12 @@ export default function HabitPage() {
             <Text style={styles.inputText}>Frequência</Text>
             <SelectFrequency
               habitFrequency={'Diário'}
-              frequencyInput={() => {}}
+              frequencyInput={setFrequencyInput}
             />
             {frequencyInput === 'Mensal' ? null : (
               <Notification
                 notificationToggle={notificationToggle}
-                setNotificationToggle={() => {}}
+                setNotificationToggle={setNotificationToggle}
               />
             )}
 
@@ -193,9 +65,9 @@ export default function HabitPage() {
               frequencyInput === 'Mensal' ? null : (
                 <TimeDataPicker
                   frequency={frequencyInput}
-                  dayNotification={'1'}
-                  setDayNotification={() => {}}
-                  setTimeNotification={() => {}}
+                  dayNotification={dayNotification}
+                  setDayNotification={setDayNotification}
+                  setTimeNotification={setTimeNotification}
                 />
               )
             ) : null}

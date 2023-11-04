@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 16,
-    margintop: 20,
+    marginTop: 20,
     marginBottom: 10,
   },
 

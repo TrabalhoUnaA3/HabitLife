@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, ScrollView, Text, Image, StyleSheet} from 'react-native';
+import {View, ScrollView, Text, StyleSheet} from 'react-native';
 import DefaultButton from '../../../src/components/common/DefaultButton';
 
 import LifeStatus from '../../../src/components/common/LifeStatus';
@@ -9,10 +9,7 @@ export default function Start() {
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{alignItems: 'center'}}>
-          <Image
-            source={require('../../assets/icons/logo3.png')}
-            style={styles.logo}
-          />
+          <Text style={styles.title}>HabitLife</Text>
           <LifeStatus />
           <Text style={styles.description}>
             Vamos transformar sua vida {'\n'} em jogo, buscando sempre {'\n'} o
@@ -37,8 +34,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(21, 21, 21, .98)',
   },
 
-  logo: {
-    width: 300,
+  title: {
+    fontSize: 40,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
     height: 60,
     marginTop: 60,
     marginBottom: 20,
