@@ -14,6 +14,7 @@ import Notification from '../../../src/components/HabitPage/Notification';
 import TimeDataPicker from '../../../src/components/HabitPage/TimeDataPicker';
 import UpdateExcludeButtons from '../../../src/components/HabitPage/UpdateExcludeButtons';
 import DefaultButton from '../../../src/components/common/DefaultButton';
+import CreateHabitModal from '../../components/HabitPage/CreateHabitModal';
 
 // Notifications.setNotificationHandler({
 //   handleNotification: async () => ({
@@ -28,6 +29,7 @@ export default function HabitPage() {
   const [notificationToggle, setNotificationToggle] = useState(false);
   const [dayNotification, setDayNotification] = useState('');
   const [timeNotification, setTimeNotification] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   var create = true;
 
@@ -35,6 +37,11 @@ export default function HabitPage() {
     <View style={styles.container}>
       <ScrollView>
         <View>
+          <CreateHabitModal
+            modalVisible={modalVisible}
+            setModalVisible={setModalVisible}
+            habitColor="#90B7F3"
+          />
           <TouchableOpacity style={styles.backPageBtn} onPress={() => {}}>
             <Image
               source={require('../../assets/icons/arrowBack.png')}
@@ -47,7 +54,15 @@ export default function HabitPage() {
             <View style={styles.inputContainer}>
               <Text style={styles.area}>{'Mente'}</Text>
             </View>
-            <Text style={styles.inputText}>Hábito</Text>
+            <View style={styles.addHabitRow}>
+              <Text style={styles.inputText}>Hábito</Text>
+              <TouchableOpacity onPress={() => setModalVisible(true)}>
+                <Image
+                  source={require('../../assets/icons/addCircle.png')}
+                  style={styles.addHabitButton}
+                />
+              </TouchableOpacity>
+            </View>
             <SelectHabit />
             <Text style={styles.inputText}>Frequência</Text>
             <SelectFrequency
@@ -136,5 +151,16 @@ const styles = StyleSheet.create({
   area: {
     color: '#BBBBBB',
     fontSize: 15,
+  },
+  addHabitRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  addHabitButton: {
+    width: 30,
+    height: 30,
+    marginTop: 35,
+    marginBottom: 10,
   },
 });
