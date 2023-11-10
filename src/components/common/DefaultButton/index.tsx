@@ -7,11 +7,13 @@ export default function DefaultButton({
   handlePress,
   width,
   height,
+  disabled,
 }: DefaultButtonProps) {
   return (
     <TouchableOpacity
       style={[styles.button, {width, height}]}
       activeOpacity={0.7}
+      disabled={disabled}
       onPress={handlePress}>
       <Text style={styles.buttonText}>{buttonText}</Text>
     </TouchableOpacity>

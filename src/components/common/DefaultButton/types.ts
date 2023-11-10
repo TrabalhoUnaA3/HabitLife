@@ -3,4 +3,5 @@ export interface DefaultButtonProps {
   handlePress: () => void;
   width: number;
   height: number;
+  disabled?: boolean;
 }
