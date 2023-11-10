@@ -46,15 +46,16 @@ export default class Habit {
             ${TITLE_COLUMN},
             ${DESCRIPTION_COLUMN}, 
             ${CREATED_AT_COLUMN}, 
-            ${ID_COL}, 
-            ${HABIT_TYPE_COLUMN}
+            ${HABIT_TYPE_COLUMN}, 
+            ${ID_COL}
+           
          ) VALUES (?, ?, ?, ?, ?)`;
     await db.executeSql(query, [
       habit.title,
       habit.description,
       habit.createdAt,
-      habit.id,
       habit.habitType,
+      habit.id,
     ]);
   }
 
@@ -73,8 +74,8 @@ export default class Habit {
           row[TITLE_COLUMN],
           row[DESCRIPTION_COLUMN],
           row[CREATED_AT_COLUMN],
-          row[ID_COL],
           row[HABIT_TYPE_COLUMN],
+          row[ID_COL],
         ),
       );
     }

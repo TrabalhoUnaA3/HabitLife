@@ -15,6 +15,8 @@ import TimeDataPicker from '../../../src/components/HabitPage/TimeDataPicker';
 import UpdateExcludeButtons from '../../../src/components/HabitPage/UpdateExcludeButtons';
 import DefaultButton from '../../../src/components/common/DefaultButton';
 import CreateHabitModal from '../../components/HabitPage/CreateHabitModal';
+import {getDBConnection} from '../../db';
+import Habit from '../../db/HabiDatabase';
 
 // Notifications.setNotificationHandler({
 //   handleNotification: async () => ({
@@ -30,8 +32,13 @@ export default function HabitPage() {
   const [dayNotification, setDayNotification] = useState('');
   const [timeNotification, setTimeNotification] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [habits, setHabits] = useState<Habit[]>([]);
 
   var create = true;
+
+  getDBConnection().then(db => {
+    Habit.getAll(db, 'asc').then(it => setHabits(it));
+  });
 
   return (
     <View style={styles.container}>
@@ -41,29 +48,41 @@ export default function HabitPage() {
             modalVisible={modalVisible}
             setModalVisible={setModalVisible}
             habitColor="#90B7F3"
+            habitType="Mente"
           />
-          <TouchableOpacity style={styles.backPageBtn} onPress={() => {}}>
-            <Image
-              source={require('../../assets/icons/arrowBack.png')}
-              style={styles.arrowBack}
-            />
-          </TouchableOpacity>
+          <View style={styles.header}>
+            <TouchableOpacity style={styles.backPageBtn} onPress={() => {}}>
+              <Image
+                source={require('../../assets/icons/arrowBack.png')}
+                style={styles.arrowBack}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.backPageBtn} onPress={() => {}}>
+              <Image
+                source={require('../../assets/icons/settingsIcon.png')}
+                style={styles.arrowBack}
+              />
+            </TouchableOpacity>
+          </View>
           <View style={styles.mainContent}>
-            <Text style={styles.title}>Configurações {'\n'} de hábito</Text>
+            <Text style={styles.title}>Seleção {'\n'} de hábito</Text>
             <Text style={styles.inputText}>Área</Text>
             <View style={styles.inputContainer}>
               <Text style={styles.area}>{'Mente'}</Text>
             </View>
             <View style={styles.addHabitRow}>
               <Text style={styles.inputText}>Hábito</Text>
-              <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible(true);
+                }}>
                 <Image
                   source={require('../../assets/icons/addCircle.png')}
                   style={styles.addHabitButton}
                 />
               </TouchableOpacity>
             </View>
-            <SelectHabit />
+            <SelectHabit data={habits} />
             <Text style={styles.inputText}>Frequência</Text>
             <SelectFrequency
               habitFrequency={'Diário'}
@@ -115,10 +134,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(21, 21, 21, 0.98)',
   },
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   backPageBtn: {
     width: 40,
     height: 40,
-    margin: 25,
+    margin: 20,
   },
   arrowBack: {
     width: 40,

@@ -1,16 +1,31 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Image, StyleSheet} from 'react-native';
 import {SelectList} from 'react-native-dropdown-select-list';
+import Habit from '../../../db/HabiDatabase';
 
-export default function SelectHabit() {
+interface SelectHabit {
+  data: Habit[];
+}
+
+export default function SelectHabit({data}: SelectHabit) {
+  const [selectedHabit, setSelectedHabit] = useState<string>('');
+  const [habit, setHabit] = useState<string[]>([]);
+
+  useEffect(() => {
+    setHabit(data.map(it => it.title));
+  }, [data]);
+
+  const handleSelect = (selected: string) => {
+    setSelectedHabit(selected);
+  };
   return (
     <>
       <SelectList
-        setSelected={() => {}}
-        data={['Teste1', 'Teste2']}
+        setSelected={handleSelect}
+        data={habit}
         search={false}
         onSelect={() => {}}
-        placeholder={'Teste1'}
+        placeholder={selectedHabit || 'Escolha um hábito:'}
         boxStyles={styles.boxStyle}
         inputStyles={styles.inputStyle}
         dropdownStyles={styles.dropdownStyle}
