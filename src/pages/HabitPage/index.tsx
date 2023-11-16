@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,8 @@ import DefaultButton from '../../../src/components/common/DefaultButton';
 import CreateHabitModal from '../../components/HabitPage/CreateHabitModal';
 import {getDBConnection} from '../../db';
 import Habit from '../../db/HabiDatabase';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigation} from '../../../App';
 
 // Notifications.setNotificationHandler({
 //   handleNotification: async () => ({
@@ -27,18 +29,19 @@ import Habit from '../../db/HabiDatabase';
 // });
 
 export default function HabitPage() {
+  const navigation = useNavigation<StackNavigation>();
+
   const [frequencyInput, setFrequencyInput] = useState('Diário');
   const [notificationToggle, setNotificationToggle] = useState(false);
   const [dayNotification, setDayNotification] = useState('');
   const [timeNotification, setTimeNotification] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-  const [habits, setHabits] = useState<Habit[]>([]);
 
   var create = true;
 
-  getDBConnection().then(db => {
-    Habit.getAll(db, 'asc').then(it => setHabits(it));
-  });
+  function handleCreateHabit() {
+    navigation.navigate('Home');
+  }
 
   return (
     <View style={styles.container}>
@@ -82,7 +85,7 @@ export default function HabitPage() {
                 />
               </TouchableOpacity>
             </View>
-            <SelectHabit data={habits} />
+            <SelectHabit />
             <Text style={styles.inputText}>Frequência</Text>
             <SelectFrequency
               habitFrequency={'Diário'}
@@ -116,7 +119,7 @@ export default function HabitPage() {
               <View>
                 <DefaultButton
                   buttonText={'Criar'}
-                  handlePress={() => {}}
+                  handlePress={handleCreateHabit}
                   width={250}
                   height={50}
                 />

@@ -3,8 +3,15 @@ import {View, ScrollView, Text, StyleSheet} from 'react-native';
 import DefaultButton from '../../../src/components/common/DefaultButton';
 
 import LifeStatus from '../../../src/components/common/LifeStatus';
+import {StackNavigation} from '../../../App';
+import {useNavigation} from '@react-navigation/native';
 
 export default function Start() {
+  const navigation = useNavigation<StackNavigation>();
+
+  const handleNaveAppExplanation = () => {
+    navigation.navigate('AppExplanation');
+  };
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -18,7 +25,7 @@ export default function Start() {
 
           <DefaultButton
             buttonText={'Continuar'}
-            handlePress={() => {}}
+            handlePress={handleNaveAppExplanation}
             width={250}
             height={50}
           />

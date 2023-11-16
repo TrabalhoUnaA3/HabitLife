@@ -1,17 +1,18 @@
 import React, {useEffect, useState} from 'react';
 import {Image, StyleSheet} from 'react-native';
 import {SelectList} from 'react-native-dropdown-select-list';
+import {getDBConnection} from '../../../db';
 import Habit from '../../../db/HabiDatabase';
 
-interface SelectHabit {
-  data: Habit[];
-}
-
-export default function SelectHabit({data}: SelectHabit) {
+export default function SelectHabit() {
   const [selectedHabit, setSelectedHabit] = useState<string>('');
   const [habit, setHabit] = useState<string[]>([]);
+  const [data, setData] = useState<Habit[]>([]);
 
   useEffect(() => {
+    getDBConnection().then(db => {
+      Habit.getAll(db, 'asc').then(it => setData(it));
+    });
     setHabit(data.map(it => it.title));
   }, [data]);
 

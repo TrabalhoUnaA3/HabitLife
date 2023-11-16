@@ -1,10 +1,42 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import LifeStatus from '../../../src/components/common/LifeStatus';
 import StatusBar from '../../../src/components/home/StatusBar';
 import CreateHabit from '../../../src/components/home/createHabit';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigation} from '../../../App';
+import ChangeNavigationService from '../../services/ChangeNavigationService';
 
 export default function Home() {
+  const navigation = useNavigation<StackNavigation>();
+
+  const today = new Date();
+
+  function handleNavExplanation() {
+    navigation.navigate('AppExplanation');
+  }
+  function handleGameOver() {
+    navigation.navigate('Start');
+  }
+
+  useEffect(() => {
+    ChangeNavigationService.checkShowHome(1).then(showHome => {
+      const month = `${today.getMonth() + 1}`.padStart(2, '0');
+      const day = `${today.getDate()}`.padStart(2, '0');
+      const formDate = `${today.getFullYear()}-${month}-${day}`;
+      const checkDays =
+        new Date(formDate).valueOf() -
+        new Date(showHome.appStartData).valueOf() +
+        1;
+
+      if (checkDays === 0) {
+        // setRobotDaysLife(checkDays.toString().padStart(2, '0'));
+      } else {
+        // setRobotDaysLife(parseInt(checkDays / (1000 * 3600 * 24)));
+      }
+    });
+  });
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -21,7 +53,7 @@ export default function Home() {
             <Text
               style={styles.explanationText}
               onPress={() => {
-                // handleNavExplanation();
+                handleNavExplanation();
               }}>
               Ver explicações novamente
             </Text>
