@@ -15,7 +15,6 @@ import TimeDataPicker from '../../../src/components/HabitPage/TimeDataPicker';
 import UpdateExcludeButtons from '../../../src/components/HabitPage/UpdateExcludeButtons';
 import DefaultButton from '../../../src/components/common/DefaultButton';
 import CreateHabitModal from '../../components/HabitPage/CreateHabitModal';
-import {getDBConnection} from '../../db';
 import Habit from '../../db/HabiDatabase';
 import {RouteProp, useNavigation} from '@react-navigation/native';
 import {StackScreenProps} from '@react-navigation/stack';
@@ -28,6 +27,30 @@ import {RootStackParamList, StackNavigation} from '../../../App';
 //     shouldSetBadge: false,
 //   }),
 // });
+export const getHabitColor = (habitArea: string) => {
+  let color;
+
+  switch (habitArea) {
+    case 'Mente':
+      color = '#90B7F3';
+      break;
+    case 'Financeiro':
+      color = '#85BB65';
+      break;
+    case 'Corpo':
+      color = '#FF0044';
+      break;
+    case 'Humor':
+      color = '#FE7F23';
+      break;
+    default:
+      color = '#000000';
+      break;
+  }
+
+  return color;
+};
+
 type HabitPageProps = StackScreenProps<RootStackParamList, 'HabitPage'>;
 
 export default function HabitPage({route}: HabitPageProps) {
@@ -45,29 +68,9 @@ export default function HabitPage({route}: HabitPageProps) {
     navigation.navigate('Home');
   }
 
-  const getHabitColor = (habitArea: string) => {
-    let color;
-
-    switch (habitArea) {
-      case 'Mente':
-        color = '#90B7F3';
-        break;
-      case 'Financeiro':
-        color = '#85BB65';
-        break;
-      case 'Corpo':
-        color = '#FF0044';
-        break;
-      case 'Humor':
-        color = '#FE7F23';
-        break;
-      default:
-        color = '#000000';
-        break;
-    }
-
-    return color;
-  };
+  function openHabitsConfiguration() {
+    navigation.navigate('HabitsConfiguration');
+  }
 
   return (
     <View style={styles.container}>
@@ -81,13 +84,17 @@ export default function HabitPage({route}: HabitPageProps) {
           />
 
           <View style={styles.header}>
-            <TouchableOpacity style={styles.backPageBtn} onPress={() => {}}>
+            <TouchableOpacity
+              style={styles.backPageBtn}
+              onPress={handleCreateHabit}>
               <Image
                 source={require('../../assets/icons/arrowBack.png')}
                 style={styles.arrowBack}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.backPageBtn} onPress={() => {}}>
+            <TouchableOpacity
+              style={styles.backPageBtn}
+              onPress={openHabitsConfiguration}>
               <Image
                 source={require('../../assets/icons/settingsIcon.png')}
                 style={styles.arrowBack}

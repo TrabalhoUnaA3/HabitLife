@@ -15,14 +15,14 @@ export default function HomePage() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Start" component={Start} />
-        <Stack.Screen name="AppExplanation" component={AppExplanation} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="HabitPage" component={HabitPage} />
         <Stack.Screen
           name="HabitsConfiguration"
           component={HabitsConfiguration}
         />
+        <Stack.Screen name="Start" component={Start} />
+        <Stack.Screen name="AppExplanation" component={AppExplanation} />
       </Stack.Navigator>
     </NavigationContainer>
   );

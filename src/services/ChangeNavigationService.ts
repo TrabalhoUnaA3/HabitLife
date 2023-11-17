@@ -1,16 +1,12 @@
-import {SQLiteDatabase, enablePromise} from 'react-native-sqlite-storage';
-import {getDBConnection} from '../db';
+import {enablePromise} from 'react-native-sqlite-storage';
+import DatabaseManager from '../db';
 
 enablePromise(true);
 
-let db: SQLiteDatabase | null = null;
+let db = DatabaseManager.db;
 
-export async function initializeDatabase() {
-  db = await getDBConnection();
-  db.executeSql(
-    'CREATE TABLE IF NOT EXISTS change_navigation(id INTEGER PRIMARY KEY AUTOINCREMENT, showHome TEXT, appStartData TEXT);',
-  ).catch(err => console.error(err));
-}
+export const navigationQuery =
+  'CREATE TABLE IF NOT EXISTS change_navigation(id INTEGER PRIMARY KEY AUTOINCREMENT, showHome TEXT, appStartData TEXT);';
 
 interface ChangeNavigationObject {
   showHome: string;

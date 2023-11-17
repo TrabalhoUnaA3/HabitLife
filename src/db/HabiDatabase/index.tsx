@@ -1,4 +1,5 @@
-import {enablePromise, SQLiteDatabase} from 'react-native-sqlite-storage';
+import {enablePromise} from 'react-native-sqlite-storage';
+import DatabaseManager from '../../db';
 
 const TABLE_NAME = 'Habits';
 const TITLE_COLUMN = 'title';
@@ -7,18 +8,17 @@ const CREATED_AT_COLUMN = 'created_at';
 const HABIT_TYPE_COLUMN = 'habit_type';
 const ID_COL = 'id';
 
+const db = DatabaseManager.db;
+
 enablePromise(true);
 
-export const createTable = async (db: SQLiteDatabase) => {
-  const query = `CREATE TABLE IF NOT EXISTS ${TABLE_NAME}(
+export const habitQuery = `CREATE TABLE IF NOT EXISTS ${TABLE_NAME}(
           ${TITLE_COLUMN} VARCHAR(255) NOT NULL,
           ${DESCRIPTION_COLUMN} VARCHAR(255) NOT NULL,
           ${CREATED_AT_COLUMN} VARCHAR(50) NOT NULL,
           ${HABIT_TYPE_COLUMN} VARCHAR(50) NOT NULL,
           ${ID_COL} TEXT PRIMARY KEY
       )`;
-  await db.executeSql(query);
-};
 
 export default class Habit {
   title: string;
@@ -41,7 +41,7 @@ export default class Habit {
     this.id = id;
   }
 
-  static async create(db: SQLiteDatabase, habit: Habit) {
+  static async create(habit: Habit) {
     const query = `INSERT INTO ${TABLE_NAME} (
             ${TITLE_COLUMN},
             ${DESCRIPTION_COLUMN}, 
@@ -50,7 +50,7 @@ export default class Habit {
             ${ID_COL}
            
          ) VALUES (?, ?, ?, ?, ?)`;
-    await db.executeSql(query, [
+    await db?.executeSql(query, [
       habit.title,
       habit.description,
       habit.createdAt,
@@ -59,14 +59,14 @@ export default class Habit {
     ]);
   }
 
-  static async getAll(
-    db: SQLiteDatabase,
-    orderBy: 'asc' | 'desc' = 'desc',
-  ): Promise<Habit[]> {
+  static async getAll(orderBy: 'asc' | 'desc' = 'desc'): Promise<Habit[]> {
     const query = `SELECT * FROM ${TABLE_NAME} ORDER BY ${CREATED_AT_COLUMN} ${orderBy}`;
-    const [result] = await db.executeSql(query, []);
-
     const habits: Habit[] = [];
+    if (db == null) {
+      return habits;
+    }
+    const [result] = await db?.executeSql(query, []);
+
     for (let i = 0; i < result.rows.length; i++) {
       const row = result.rows.item(i);
       habits.push(
@@ -83,13 +83,13 @@ export default class Habit {
     return habits;
   }
 
-  static async update(db: SQLiteDatabase, habit: Habit) {
-    const query = `UPDATE ${TABLE_NAME} SET ${DESCRIPTION_COLUMN} = ?, ${HABIT_TYPE_COLUMN} = ? WHERE ${ID_COL} = ?`;
-    await db.executeSql(query, [habit.description, habit.habitType, habit.id]);
+  static async update(habit: Habit) {
+    const query = `UPDATE ${TABLE_NAME} SET ${TITLE_COLUMN} = ?, ${DESCRIPTION_COLUMN} = ? WHERE ${ID_COL} = ?`;
+    await db?.executeSql(query, [habit.title, habit.description, habit.id]);
   }
 
-  static async delete(db: SQLiteDatabase, id: string) {
+  static async delete(id: string) {
     const query = `DELETE FROM ${TABLE_NAME} WHERE ${ID_COL} = ?`;
-    await db.executeSql(query, [id]);
+    await db?.executeSql(query, [id]);
   }
 }

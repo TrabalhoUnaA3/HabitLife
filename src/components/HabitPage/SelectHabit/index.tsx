@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Image, StyleSheet} from 'react-native';
 import {SelectList} from 'react-native-dropdown-select-list';
-import {getDBConnection} from '../../../db';
 import Habit from '../../../db/HabiDatabase';
 
 export default function SelectHabit() {
@@ -10,9 +9,7 @@ export default function SelectHabit() {
   const [data, setData] = useState<Habit[]>([]);
 
   useEffect(() => {
-    getDBConnection().then(db => {
-      Habit.getAll(db, 'asc').then(it => setData(it));
-    });
+    Habit.getAll('asc').then(it => setData(it));
     setHabit(data.map(it => it.title));
   }, [data]);
 
