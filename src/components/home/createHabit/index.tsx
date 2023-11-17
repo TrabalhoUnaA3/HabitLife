@@ -1,5 +1,7 @@
+import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {StackNavigation} from '../../../../App';
 
 interface CreateHabit {
   habitArea?: any;
@@ -7,7 +9,13 @@ interface CreateHabit {
 }
 
 export default function CreateHabit({habitArea, borderColor}: CreateHabit) {
-  function handleCreate() {}
+  const navigation = useNavigation<StackNavigation>();
+  function handleCreate() {
+    navigation.navigate('HabitPage', {
+      create: true,
+      habit: {habitArea: habitArea},
+    });
+  }
 
   return (
     <TouchableOpacity

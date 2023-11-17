@@ -21,22 +21,24 @@ export default function AppExplanation() {
   }
 
   function HandleSetShowHome() {
-    console.log('!passou');
-    console.log(showHome);
     initializeDatabase()
       .then(() => {
         if (showHome !== 'true') {
-          console.log('passou');
-          ChangeNavigationService.setShowHome({showHome: 'true', appStartData})
-            .then(() => console.log(`Sucesso! ${showHome} ${appStartData}`))
+          ChangeNavigationService.setShowHome({
+            showHome: 'true',
+            appStartData,
+          })
+            .then(() => {
+              console.log(`Sucesso! ${showHome} ${appStartData}`);
+            })
             .catch(err => console.error(err));
-          setShowHome('true');
 
           handleNavHome();
         }
       })
       .catch(err => console.error(err));
   }
+
   return (
     <View style={styles.container}>
       <ScrollView>

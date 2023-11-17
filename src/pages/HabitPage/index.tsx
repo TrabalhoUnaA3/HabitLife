@@ -17,8 +17,9 @@ import DefaultButton from '../../../src/components/common/DefaultButton';
 import CreateHabitModal from '../../components/HabitPage/CreateHabitModal';
 import {getDBConnection} from '../../db';
 import Habit from '../../db/HabiDatabase';
-import {useNavigation} from '@react-navigation/native';
-import {StackNavigation} from '../../../App';
+import {RouteProp, useNavigation} from '@react-navigation/native';
+import {StackScreenProps} from '@react-navigation/stack';
+import {RootStackParamList, StackNavigation} from '../../../App';
 
 // Notifications.setNotificationHandler({
 //   handleNotification: async () => ({
@@ -27,8 +28,9 @@ import {StackNavigation} from '../../../App';
 //     shouldSetBadge: false,
 //   }),
 // });
+type HabitPageProps = StackScreenProps<RootStackParamList, 'HabitPage'>;
 
-export default function HabitPage() {
+export default function HabitPage({route}: HabitPageProps) {
   const navigation = useNavigation<StackNavigation>();
 
   const [frequencyInput, setFrequencyInput] = useState('Diário');
@@ -37,11 +39,35 @@ export default function HabitPage() {
   const [timeNotification, setTimeNotification] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
 
-  var create = true;
+  const {create, habit} = route.params;
 
   function handleCreateHabit() {
     navigation.navigate('Home');
   }
+
+  const getHabitColor = (habitArea: string) => {
+    let color;
+
+    switch (habitArea) {
+      case 'Mente':
+        color = '#90B7F3';
+        break;
+      case 'Financeiro':
+        color = '#85BB65';
+        break;
+      case 'Corpo':
+        color = '#FF0044';
+        break;
+      case 'Humor':
+        color = '#FE7F23';
+        break;
+      default:
+        color = '#000000';
+        break;
+    }
+
+    return color;
+  };
 
   return (
     <View style={styles.container}>
@@ -50,9 +76,10 @@ export default function HabitPage() {
           <CreateHabitModal
             modalVisible={modalVisible}
             setModalVisible={setModalVisible}
-            habitColor="#90B7F3"
-            habitType="Mente"
+            habitColor={getHabitColor(habit.habitArea)}
+            habitType={habit.habitArea}
           />
+
           <View style={styles.header}>
             <TouchableOpacity style={styles.backPageBtn} onPress={() => {}}>
               <Image
@@ -71,7 +98,7 @@ export default function HabitPage() {
             <Text style={styles.title}>Seleção {'\n'} de hábito</Text>
             <Text style={styles.inputText}>Área</Text>
             <View style={styles.inputContainer}>
-              <Text style={styles.area}>{'Mente'}</Text>
+              <Text style={styles.area}>{habit.habitArea}</Text>
             </View>
             <View style={styles.addHabitRow}>
               <Text style={styles.inputText}>Hábito</Text>
@@ -112,7 +139,7 @@ export default function HabitPage() {
             {create === false ? (
               <UpdateExcludeButtons
                 handleUpdate={() => {}}
-                habitArea={'Mente'}
+                habitArea={habit.habitArea}
                 habitInput={'A'}
               />
             ) : (
