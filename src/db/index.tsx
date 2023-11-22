@@ -66,13 +66,18 @@ class DatabaseManager {
 
   private createTables() {
     const createTableQueries = [navigationQuery, habitQuery];
+    let tablesCreated = false;
 
     this.executeTransaction(tx => {
-      createTableQueries.forEach(query => {
-        tx.executeSql(query);
-      });
+      if (!tablesCreated) {
+        createTableQueries.forEach(query => {
+          tx.executeSql(query);
+        });
+      }
     })
-      .then(() => console.log('Tables created successfully'))
+      .then(() => {
+        tablesCreated = true;
+      })
       .catch(error => console.error('Error creating tables: ', error));
   }
 }
