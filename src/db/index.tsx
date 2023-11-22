@@ -3,8 +3,9 @@ import {
   Transaction,
   openDatabase,
 } from 'react-native-sqlite-storage';
-import {habitQuery} from './HabiDatabase';
-import {navigationQuery} from '../services/ChangeNavigationService';
+import { habitQuery } from './HabiDatabase';
+import { navigationQuery } from '../services/ChangeNavigationService';
+import { createHabitsTable } from '../services/HabitsService';
 
 class DatabaseManager {
   public db: SQLiteDatabase | null = null;
@@ -65,7 +66,7 @@ class DatabaseManager {
   }
 
   private createTables() {
-    const createTableQueries = [navigationQuery, habitQuery];
+    const createTableQueries = [navigationQuery, habitQuery, createHabitsTable];
     let tablesCreated = false;
 
     this.executeTransaction(tx => {
