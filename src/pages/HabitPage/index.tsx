@@ -108,7 +108,7 @@ export default function HabitPage({route}: HabitPageProps) {
       }).then(() => {
         Alert.alert('Sucesso na criação do hábito!');
         navigation.navigate('Home', {
-          updateHabit: `Updated in ${habit?.habitArea}`,
+          createHabit: `Created in ${habit?.habitArea}`,
         });
       });
     }
