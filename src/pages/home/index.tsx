@@ -1,16 +1,25 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import LifeStatus from '../../../src/components/common/LifeStatus';
 import StatusBar from '../../../src/components/home/StatusBar';
 import CreateHabit from '../../../src/components/home/createHabit';
 import {useNavigation} from '@react-navigation/native';
-import {StackNavigation} from '../../../App';
+import {RootStackParamList, StackNavigation} from '../../../App';
 import ChangeNavigationService from '../../services/ChangeNavigationService';
+import CreateHabits from '../../services/HabitsService';
+import {StackScreenProps} from '@react-navigation/stack';
+import EditHabit from '../../components/home/EditHabit';
 
-export default function Home() {
+type HabitPageProps = StackScreenProps<RootStackParamList, 'Home'>;
+
+export default function Home({route}: HabitPageProps) {
   const navigation = useNavigation<StackNavigation>();
+  const [mindHabit, setMindHabit] = useState<CreateHabits | null>();
+  const [moneyHabit, setMoneyHabit] = useState<CreateHabits | null>();
+  const [bodyHabit, setBodyHabit] = useState<CreateHabits | null>();
+  const [funHabit, setFunHabit] = useState<CreateHabits | null>();
 
-  const today = new Date();
+  const [robotDaysLife, setRobotDaysLife] = useState<string>();
 
   function handleNavExplanation() {
     navigation.navigate('AppExplanation');
@@ -19,7 +28,39 @@ export default function Home() {
     navigation.navigate('Start');
   }
 
+  const excludeArea = route.params?.excludeArea;
+
   useEffect(() => {
+    const today = new Date();
+
+    CreateHabits.findByArea('Mente').then(mind => {
+      setMindHabit(mind[0]);
+    });
+    CreateHabits.findByArea('Financeiro').then(money => {
+      setMoneyHabit(money[0]);
+    });
+    CreateHabits.findByArea('Corpo').then(body => {
+      setBodyHabit(body[0]);
+    });
+    CreateHabits.findByArea('Humor').then(fun => {
+      setFunHabit(fun[0]);
+    });
+
+    if (excludeArea) {
+      if (excludeArea === 'Mente') {
+        setMindHabit(null);
+      }
+      if (excludeArea === 'Financeiro') {
+        setMoneyHabit(null);
+      }
+      if (excludeArea === 'Corpo') {
+        setBodyHabit(null);
+      }
+      if (excludeArea === 'Humor') {
+        setFunHabit(null);
+      }
+    }
+
     ChangeNavigationService.checkShowHome(1).then(showHome => {
       const month = `${today.getMonth() + 1}`.padStart(2, '0');
       const day = `${today.getDate()}`.padStart(2, '0');
@@ -30,25 +71,51 @@ export default function Home() {
         1;
 
       if (checkDays === 0) {
-        // setRobotDaysLife(checkDays.toString().padStart(2, '0'));
+        setRobotDaysLife(checkDays.toString().padStart(2, '0'));
       } else {
-        // setRobotDaysLife(parseInt(checkDays / (1000 * 3600 * 24)));
+        setRobotDaysLife((checkDays / (1000 * 3600 * 24)).toString());
       }
     });
-  });
+  }, [excludeArea]);
 
   return (
     <View style={styles.container}>
       <ScrollView>
         <View style={{alignItems: 'center'}}>
           <Text style={styles.dailyChecks}>{'❤️ 5 dias - ✔️ 0 Checks'}</Text>
-          <LifeStatus />
-          <StatusBar mindHabit={1} moneyHabit={1} bodyHabit={1} funHabit={1} />
+          <LifeStatus
+            mindHabit={mindHabit}
+            moneyHabit={moneyHabit}
+            bodyHabit={bodyHabit}
+            funHabit={funHabit}
+          />
+          <StatusBar
+            mindHabit={mindHabit?.progressBar}
+            moneyHabit={moneyHabit?.progressBar}
+            bodyHabit={bodyHabit?.progressBar}
+            funHabit={funHabit?.progressBar}
+          />
           <View>
-            <CreateHabit habitArea="Mente" borderColor="#90B7F3" />
-            <CreateHabit habitArea="Financeiro" borderColor="#85BB65" />
-            <CreateHabit habitArea="Corpo" borderColor="#FF0044" />
-            <CreateHabit habitArea="Humor" borderColor="#FE7F23" />
+            {mindHabit ? (
+              <EditHabit habit={mindHabit} checkColor="#90B7F3" />
+            ) : (
+              <CreateHabit habitArea="Mente" borderColor="#90B7F3" />
+            )}
+            {moneyHabit ? (
+              <EditHabit habit={moneyHabit} checkColor="#85BB65" />
+            ) : (
+              <CreateHabit habitArea="Financeiro" borderColor="#85BB65" />
+            )}
+            {bodyHabit ? (
+              <EditHabit habit={bodyHabit} checkColor="#FF0044" />
+            ) : (
+              <CreateHabit habitArea="Corpo" borderColor="#FF0044" />
+            )}
+            {funHabit ? (
+              <EditHabit habit={funHabit} checkColor="#FE7F23" />
+            ) : (
+              <CreateHabit habitArea="Humor" borderColor="#FE7F23" />
+            )}
 
             <Text
               style={styles.explanationText}

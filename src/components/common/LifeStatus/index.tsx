@@ -1,25 +1,54 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, StyleSheet} from 'react-native';
 import LottieView from 'lottie-react-native';
+import {CreateHabitObject} from '../../../services/HabitsService';
+import AnimationService from '../../../services/AnimationService';
 
-export default function LifeStatus() {
+interface LifeStatus {
+  mindHabit?: CreateHabitObject;
+  moneyHabit?: CreateHabitObject;
+  bodyHabit?: CreateHabitObject;
+  funHabit?: CreateHabitObject;
+}
+
+export default function LifeStatus({
+  mindHabit,
+  moneyHabit,
+  bodyHabit,
+  funHabit,
+}: LifeStatus) {
+  const [mind, setMind] = useState('');
+  const [money, setMoney] = useState('');
+  const [robot, setRobot] = useState('');
+
+  useEffect(() => {
+    AnimationService.animationStatus(
+      mindHabit?.progressBar,
+      moneyHabit?.progressBar,
+      bodyHabit?.progressBar,
+      funHabit?.progressBar,
+      setMind,
+      setMoney,
+      setRobot,
+    );
+  }, [mindHabit, moneyHabit, bodyHabit, funHabit]);
   return (
     <View style={styles.container}>
       <View style={styles.animationWrapper}>
         <LottieView
-          source={require('../../../assets/education/education-100.json')}
+          source={mind}
           autoPlay
           loop
           style={styles.educationAnimation}
         />
         <LottieView
-          source={require('../../../assets/robot/robot-100-100.json')}
+          source={money}
           autoPlay
           loop
           style={styles.robotAnimation}
         />
         <LottieView
-          source={require('../../../assets/money/money-100.json')}
+          source={robot}
           autoPlay
           loop
           style={styles.moneyAnimation}

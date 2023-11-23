@@ -3,15 +3,20 @@ import {Image, StyleSheet} from 'react-native';
 import {SelectList} from 'react-native-dropdown-select-list';
 import Habit from '../../../db/HabiDatabase';
 
-export default function SelectHabit() {
+interface SelectHabit {
+  habitType: string;
+  habitInput: React.Dispatch<React.SetStateAction<string>>;
+}
+
+export default function SelectHabit({habitType, habitInput}: SelectHabit) {
   const [selectedHabit, setSelectedHabit] = useState<string>('');
   const [habit, setHabit] = useState<string[]>([]);
   const [data, setData] = useState<Habit[]>([]);
 
   useEffect(() => {
-    Habit.getAll('asc').then(it => setData(it));
+    Habit.getAll('asc', habitType).then(it => setData(it));
     setHabit(data.map(it => it.title));
-  }, [data]);
+  }, [data, habitType]);
 
   const handleSelect = (selected: string) => {
     setSelectedHabit(selected);
@@ -22,7 +27,7 @@ export default function SelectHabit() {
         setSelected={handleSelect}
         data={habit}
         search={false}
-        onSelect={() => {}}
+        onSelect={() => habitInput(selectedHabit)}
         placeholder={selectedHabit || 'Escolha um hábito:'}
         boxStyles={styles.boxStyle}
         inputStyles={styles.inputStyle}

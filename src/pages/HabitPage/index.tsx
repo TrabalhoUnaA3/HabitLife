@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native';
 import SelectHabit from '../../components/HabitPage/SelectHabit';
 import SelectFrequency from '../../../src/components/HabitPage/SelectFrequency';
@@ -19,6 +20,7 @@ import Habit from '../../db/HabiDatabase';
 import {RouteProp, useNavigation} from '@react-navigation/native';
 import {StackScreenProps} from '@react-navigation/stack';
 import {RootStackParamList, StackNavigation} from '../../../App';
+import CreateHabits from '../../services/HabitsService';
 
 // Notifications.setNotificationHandler({
 //   handleNotification: async () => ({
@@ -56,16 +58,60 @@ type HabitPageProps = StackScreenProps<RootStackParamList, 'HabitPage'>;
 export default function HabitPage({route}: HabitPageProps) {
   const navigation = useNavigation<StackNavigation>();
 
+  const [habitInput, setHabitInput] = useState('');
+
   const [frequencyInput, setFrequencyInput] = useState('Diário');
   const [notificationToggle, setNotificationToggle] = useState(false);
   const [dayNotification, setDayNotification] = useState('');
   const [timeNotification, setTimeNotification] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
 
+  const habitCreated = new Date();
+
+  const formatDate = `${habitCreated.getFullYear()}-${habitCreated.getMonth()}-${habitCreated.getDate()}`;
+
   const {create, habit} = route.params;
 
   function handleCreateHabit() {
-    navigation.navigate('Home');
+    if (habitInput === undefined || frequencyInput === undefined) {
+      Alert.alert(
+        'Você precisa selecionar um hábito e frequência para continuar',
+      );
+    } else if (
+      notificationToggle === true &&
+      frequencyInput === 'Diário' &&
+      timeNotification === undefined
+    ) {
+      Alert.alert('Você precisa dizer o horário da notificação!');
+    } else if (
+      notificationToggle === true &&
+      frequencyInput === 'Diário' &&
+      dayNotification === undefined &&
+      timeNotification === undefined
+    ) {
+      Alert.alert(
+        'Você precisa dizer a frequência e o horário da notificação!',
+      );
+    } else {
+      CreateHabits.createHabit({
+        habitArea: habit?.habitArea,
+        habitName: habitInput,
+        habitFrequency: frequencyInput,
+        habitHasNotification: notificationToggle,
+        habitNotificationFrequency: dayNotification,
+        habitNotificationTime: timeNotification,
+        lastCheck: formatDate,
+        daysWithoutChecks: 0,
+        habitIsChecked: 0,
+        progressBar: 1,
+        habitChecks: 0,
+      }).then(() => {
+        Alert.alert('Sucesso na criação do hábito!');
+        navigation.navigate('Home', {
+          updateHabit: `Updated in ${habit?.habitArea}`,
+        });
+      });
+    }
   }
 
   function openHabitsConfiguration() {
@@ -119,7 +165,10 @@ export default function HabitPage({route}: HabitPageProps) {
                 />
               </TouchableOpacity>
             </View>
-            <SelectHabit />
+            <SelectHabit
+              habitType={habit.habitArea}
+              habitInput={setHabitInput}
+            />
             <Text style={styles.inputText}>Frequência</Text>
             <SelectFrequency
               habitFrequency={'Diário'}

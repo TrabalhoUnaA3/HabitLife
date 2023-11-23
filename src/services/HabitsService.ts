@@ -1,150 +1,182 @@
-import { enablePromise } from 'react-native-sqlite-storage';
+import {enablePromise} from 'react-native-sqlite-storage';
 import DatabaseManager from '../db';
 
 enablePromise(true);
 
+const TABLE_NAME = 'create_habits';
+const ID_COLUMN = 'id';
+const HABIT_AREA_COLUMN = 'habitArea';
+const HABIT_NAME_COLUMN = 'habitName';
+const HABIT_FREQUENCY_COLUMN = 'habitFrequency';
+const HABIT_HAS_NOTIFICATION_COLUMN = 'habitHasNotification';
+const HABIT_NOTIFICATION_FREQUENCY_COLUMN = 'habitNotificationFrequency';
+const HABIT_NOTIFICATION_TIME_COLUMN = 'habitNotificationTime';
+const LAST_CHECK_COLUMN = 'lastCheck';
+const DAYS_WITHOUT_CHECKS_COLUMN = 'daysWithoutChecks';
+const PROGRESS_BAR_COLUMN = 'progressBar';
+const HABIT_IS_CHECKED_COLUMN = 'habitIsChecked';
+const HABIT_CHECKS_COLUMN = 'habitChecks';
+
 let db = DatabaseManager.db;
 
-export const createHabitsTable = `CREATE TABLE IF NOT EXISTS habits (
-    id INTEGER PRIMARY KEY AUTOINCREMENT, 
-    habitArea TEXT, 
-    habitName TEXT, 
-    habitFrequency TEXT, 
-    habitHasNotification BOOLEAN, 
-    habitNotificationFrequency TEXT, 
-    habitNotificationTime TEXT, 
-    lastCheck TEXT, 
-    daysWithoutChecks INTEGER, 
-    progressBar INTEGER, 
-    habitIsChecked BOOLEAN, 
-    habitChecks INTEGER
-);`
+export const createHabitsTable = `CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
+    ${ID_COLUMN} INTEGER PRIMARY KEY AUTOINCREMENT, 
+    ${HABIT_AREA_COLUMN} TEXT, 
+    ${HABIT_NAME_COLUMN} TEXT, 
+    ${HABIT_FREQUENCY_COLUMN} TEXT, 
+    ${HABIT_HAS_NOTIFICATION_COLUMN} BOOLEAN, 
+    ${HABIT_NOTIFICATION_FREQUENCY_COLUMN} TEXT, 
+    ${HABIT_NOTIFICATION_TIME_COLUMN} TEXT, 
+    ${LAST_CHECK_COLUMN} TEXT, 
+    ${DAYS_WITHOUT_CHECKS_COLUMN} INTEGER, 
+    ${PROGRESS_BAR_COLUMN} INTEGER, 
+    ${HABIT_IS_CHECKED_COLUMN} BOOLEAN, 
+    ${HABIT_CHECKS_COLUMN} INTEGER
+);`;
 
-interface CreateHabitObject {
-    habitArea: string;
-    habitName: string;
-    habitFrequency: string;
-    habitHasNotification: string;
-    habitNotificationFrequency: string;
-    habitNotificationTime: string;
-    lastCheck: string;
-    daysWithoutChecks: string;
-    progressBar: string;
-    habitIsChecked: string;
-    habitChecks: string;
+export default class CreateHabits {
+  habitArea: string;
+  habitName: string;
+  habitFrequency: string;
+  habitHasNotification: boolean;
+  habitNotificationFrequency: string;
+  habitNotificationTime: string;
+  lastCheck: string;
+  daysWithoutChecks: number;
+  progressBar: number;
+  habitIsChecked: number;
+  habitChecks: number;
+
+  constructor(
+    habitArea: string,
+    habitName: string,
+    habitFrequency: string,
+    habitHasNotification: boolean,
+    habitNotificationFrequency: string,
+    habitNotificationTime: string,
+    lastCheck: string,
+    daysWithoutChecks: number,
+    progressBar: number,
+    habitIsChecked: number,
+    habitChecks: number,
+  ) {
+    this.habitArea = habitArea;
+    this.habitName = habitName;
+    this.habitFrequency = habitFrequency;
+    this.habitHasNotification = habitHasNotification;
+    this.habitNotificationFrequency = habitNotificationFrequency;
+    this.habitNotificationTime = habitNotificationTime;
+    this.lastCheck = lastCheck;
+    this.daysWithoutChecks = daysWithoutChecks;
+    this.progressBar = progressBar;
+    this.habitIsChecked = habitIsChecked;
+    this.habitChecks = habitChecks;
+  }
+
+  static createHabit(obj: CreateHabits): Promise<any> {
+    return new Promise((resolve, reject) => {
+      db?.transaction(tx => {
+        return tx.executeSql(
+          `INSERT INTO ${TABLE_NAME} (
+                      ${HABIT_AREA_COLUMN}, 
+                      ${HABIT_NAME_COLUMN}, 
+                      ${HABIT_FREQUENCY_COLUMN}, 
+                      ${HABIT_HAS_NOTIFICATION_COLUMN}, 
+                      ${HABIT_NOTIFICATION_FREQUENCY_COLUMN}, 
+                      ${HABIT_NOTIFICATION_TIME_COLUMN}, 
+                      ${LAST_CHECK_COLUMN}, 
+                      ${DAYS_WITHOUT_CHECKS_COLUMN}, 
+                      ${PROGRESS_BAR_COLUMN}, 
+                      ${HABIT_IS_CHECKED_COLUMN}, 
+                      ${HABIT_CHECKS_COLUMN}) 
+                  values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+          [
+            obj.habitArea,
+            obj.habitName,
+            obj.habitFrequency,
+            obj.habitHasNotification,
+            obj.habitNotificationFrequency,
+            obj.habitNotificationTime,
+            obj.lastCheck,
+            obj.daysWithoutChecks,
+            obj.progressBar,
+            obj.habitIsChecked,
+            obj.habitChecks,
+          ],
+          (_, {rowsAffected, insertId}) => {
+            if (rowsAffected > 0) resolve(insertId);
+            else reject('Error inserting obj: ' + JSON.stringify(obj));
+          },
+          (_, error) => reject(error),
+        );
+      });
+    });
+  }
+
+  static async findByArea(habitArea: string): Promise<CreateHabits[]> {
+    const query = `SELECT * FROM ${TABLE_NAME} WHERE ${HABIT_AREA_COLUMN} LIKE ?;`;
+    const habits: CreateHabits[] = [];
+    if (db == null) {
+      return habits;
+    }
+    const [result] = await db?.executeSql(query, [habitArea]);
+    for (let i = 0; i < result.rows.length; i++) {
+      const row = result.rows.item(i);
+      habits.push(
+        new CreateHabits(
+          row[HABIT_AREA_COLUMN],
+          row[HABIT_NAME_COLUMN],
+          row[HABIT_FREQUENCY_COLUMN],
+          row[HABIT_HAS_NOTIFICATION_COLUMN],
+          row[HABIT_NOTIFICATION_FREQUENCY_COLUMN],
+          row[HABIT_NOTIFICATION_TIME_COLUMN],
+          row[LAST_CHECK_COLUMN],
+          row[DAYS_WITHOUT_CHECKS_COLUMN],
+          row[PROGRESS_BAR_COLUMN],
+          row[HABIT_IS_CHECKED_COLUMN],
+          row[HABIT_CHECKS_COLUMN],
+        ),
+      );
+    }
+
+    return habits;
+  }
+  static updateHabit = (obj: CreateHabits): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      db?.transaction(tx => {
+        tx.executeSql(
+          `UPDATE ${TABLE_NAME} SET 
+                      ${HABIT_NAME_COLUMN}=?,
+                      ${HABIT_FREQUENCY_COLUMN}=?,
+                      ${HABIT_HAS_NOTIFICATION_COLUMN}=?,
+                      ${HABIT_NOTIFICATION_FREQUENCY_COLUMN}=?, 
+                      ${HABIT_NOTIFICATION_TIME_COLUMN}=? 
+                      WHERE ${HABIT_AREA_COLUMN}=?;`,
+          [
+            obj.habitName,
+            obj.habitFrequency,
+            obj.habitHasNotification,
+            obj.habitNotificationFrequency,
+            obj.habitNotificationTime,
+            obj.habitArea,
+          ],
+          (_, {rowsAffected}) => {
+            if (rowsAffected > 0) resolve(rowsAffected);
+            else reject('Error updating obj');
+          },
+          (_, error) => reject(error),
+        );
+      });
+    });
+  };
+
+  static async deleteByName(habitArea: string) {
+    const query = `DELETE FROM ${TABLE_NAME} WHERE ${HABIT_AREA_COLUMN}=?;`;
+    await db?.executeSql(query, [habitArea]);
+  }
+
+  static async changeProgress(obj: CreateHabits) {
+    const query = `UPDATE ${TABLE_NAME} SET ${PROGRESS_BAR_COLUMN}=? WHERE ${HABIT_AREA_COLUMN}=?`;
+    await db?.executeSql(query, [obj.progressBar, obj.habitArea]);
+  }
 }
-const createHabit = (obj: CreateHabitObject): Promise<any> => {
-    return new Promise((resolve, reject) => {
-        db?.transaction((tx) => {
-            return tx.executeSql(
-                `INSERT INTO habits (
-                    habitArea, 
-                    habitName, habitFrequency, 
-                    habitHasNotification, 
-                    habitNotificationFrequency, 
-                    habitNotificationTime, 
-                    lastCheck, 
-                    daysWithoutChecks, 
-                    progressBar, 
-                    habitIsChecked, 
-                    habitChecks) 
-                values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-                [
-                    obj.habitArea,
-                    obj.habitName,
-                    obj.habitFrequency,
-                    obj.habitHasNotification,
-                    obj.habitNotificationFrequency,
-                    obj.habitNotificationTime,
-                    obj.lastCheck,
-                    obj.daysWithoutChecks,
-                    obj.progressBar,
-                    obj.habitIsChecked,
-                    obj.habitChecks,
-                ],
-                (_, { rowsAffected, insertId }) => {
-                    if (rowsAffected > 0) resolve(insertId);
-                    else reject("Error inserting obj: " + JSON.stringify(obj));
-                },
-                (_, error) => reject(error)
-            );
-        });
-    });
-};
-
-
-const findByArea = (habitArea: string): Promise<CreateHabitObject> => {
-    return new Promise((resolve, reject) => {
-        db?.transaction((tx) => {
-            tx.executeSql(
-                "SELECT * FROM habits WHERE habitArea LIKE ?;",
-                [habitArea],
-                (_, result) => {
-                    const rows = result.rows;
-                    if (rows.length > 0) resolve(rows.item(0));
-                    else reject(new Error(`object not found: habitArea ${habitArea}`))
-                },
-                (_, error) => reject(error)
-            );
-        });
-    });
-};
-
-const updateHabit = (obj: CreateHabitObject): Promise<any> => {
-    return new Promise((resolve, reject) => {
-        db?.transaction((tx) => {
-            tx.executeSql(
-                `UPDATE habits SET 
-                    habitName=?,
-                    habitFrequency=?,
-                    habitHasNotification=?,
-                    habitNotificationFrequency=?, 
-                    habitNotificationTime=? 
-                    WHERE habitArea=?;`,
-                [
-                    obj.habitName,
-                    obj.habitFrequency,
-                    obj.habitHasNotification,
-                    obj.habitNotificationFrequency,
-                    obj.habitNotificationTime,
-                    obj.habitArea,
-                ],
-                (_, { rowsAffected }) => {
-                    if (rowsAffected > 0) resolve(rowsAffected);
-                    else reject("Error updating obj");
-                },
-                (_, error) => reject(error)
-            );
-        });
-    });
-};
-
-const deleteByName = async (habitArea: string) => {
-    const query =
-        `DELETE FROM habits WHERE habitArea=?;`;
-    await db?.executeSql(query, [habitArea])
-}
-
-const changeProgress = (obj: CreateHabitObject): Promise<any> => {
-    return new Promise((resolve, reject) => {
-        db?.transaction((tx) => {
-            tx.executeSql(
-                "UPDATE habits SET progressBar=? WHERE habitArea=?;",
-                [obj.progressBar, obj.habitArea],
-                (_, { rowsAffected }) => {
-                    if (rowsAffected > 0) resolve(rowsAffected);
-                    else reject("Error updating obj");
-                },
-                (_, error) => reject(error)
-            );
-        });
-    });
-};
-
-export default {
-    createHabit,
-    findByArea,
-    updateHabit,
-    deleteByName,
-    changeProgress,
-};

@@ -59,13 +59,16 @@ export default class Habit {
     ]);
   }
 
-  static async getAll(orderBy: 'asc' | 'desc' = 'desc'): Promise<Habit[]> {
-    const query = `SELECT * FROM ${TABLE_NAME} ORDER BY ${CREATED_AT_COLUMN} ${orderBy}`;
+  static async getAll(
+    orderBy: 'asc' | 'desc' = 'desc',
+    habitType: string,
+  ): Promise<Habit[]> {
+    const query = `SELECT * FROM ${TABLE_NAME} WHERE ${HABIT_TYPE_COLUMN} LIKE ? ORDER BY ${CREATED_AT_COLUMN} ${orderBy}`;
     const habits: Habit[] = [];
     if (db == null) {
       return habits;
     }
-    const [result] = await db?.executeSql(query, []);
+    const [result] = await db?.executeSql(query, [habitType]);
 
     for (let i = 0; i < result.rows.length; i++) {
       const row = result.rows.item(i);

@@ -5,7 +5,9 @@ import {NavigationProp} from '@react-navigation/native';
 import {ToastProvider} from 'react-native-toast-notifications';
 
 export type RootStackParamList = {
-  Home: undefined;
+  Home:
+    | undefined
+    | {updateHabit?: string; createHabit?: string; excludeArea?: string};
   AppExplanation: undefined;
   Start: undefined;
   HabitPage: {create: boolean; habit: {habitArea: string}};
