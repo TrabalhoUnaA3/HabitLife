@@ -2,30 +2,17 @@ import {enablePromise} from 'react-native-sqlite-storage';
 import DatabaseManager from '../db';
 
 import HabitsService from './HabitsService';
+import CreateHabits from './HabitsService';
 
 enablePromise(true);
 
 const db = DatabaseManager.db;
 
-interface CreateHabitObject {
-  habitArea: string;
-  habitName: string;
-  habitFrequency: string;
-  habitHasNotification: string;
-  habitNotificationFrequency: string;
-  habitNotificationTime: string;
-  lastCheck: string;
-  daysWithoutChecks: string;
-  progressBar: string;
-  habitIsChecked: string;
-  habitChecks: string;
-}
-
-const checkHabit = (obj: CreateHabitObject) => {
+const checkHabit = (obj: CreateHabits) => {
   return new Promise((resolve, reject) => {
     db?.transaction(tx => {
       tx.executeSql(
-        'UPDATE habits SET lastCheck=?, habitIsChecked=?, habitChecks=? WHERE habitArea=?;',
+        'UPDATE create_habits SET lastCheck=?, habitIsChecked=?, habitChecks=? WHERE habitArea=?;',
         [obj.lastCheck, obj.habitIsChecked, obj.habitChecks, obj.habitArea],
         (_, {rowsAffected}) => {
           if (rowsAffected > 0) resolve(rowsAffected);
@@ -37,11 +24,11 @@ const checkHabit = (obj: CreateHabitObject) => {
   });
 };
 
-const removeCheckHabit = (obj: CreateHabitObject) => {
+const removeCheckHabit = (obj: {habitIsChecked: number; habitArea: string}) => {
   return new Promise((resolve, reject) => {
     db?.transaction(tx => {
       tx.executeSql(
-        'UPDATE habits SET habitIsChecked=? WHERE habitArea=?;',
+        'UPDATE create_habits SET habitIsChecked=? WHERE habitArea=?;',
         [obj.habitIsChecked, obj.habitArea],
         (_, {rowsAffected}) => {
           if (rowsAffected > 0) resolve(rowsAffected);
@@ -53,11 +40,17 @@ const removeCheckHabit = (obj: CreateHabitObject) => {
   });
 };
 
-const removeCheck = (mindHabit, moneyHabit, bodyHabit, funHabit) => {
+const removeCheck = (
+  mindHabit: CreateHabits | null | undefined,
+  moneyHabit: CreateHabits | null | undefined,
+  bodyHabit: CreateHabits | null | undefined,
+  funHabit: CreateHabits | null | undefined,
+) => {
   const date = new Date();
 
   const mindLastCheck =
-    date.getDate() - (new Date(mindHabit?.lastCheck).getDate() + 1);
+    date.getDate().valueOf() -
+    (new Date(parseInt(mindHabit?.lastCheck || '0')).getDate().valueOf() + 1);
 
   if (mindHabit?.habitFrequency === 'Diário' && mindLastCheck > 0) {
     removeCheckHabit({
@@ -79,7 +72,8 @@ const removeCheck = (mindHabit, moneyHabit, bodyHabit, funHabit) => {
   }
 
   const moneyLastCheck =
-    date.getDate() - (new Date(moneyHabit?.lastCheck).getDate() + 1);
+    date.getDate().valueOf() -
+    (new Date(parseInt(moneyHabit?.lastCheck || '0')).getDate().valueOf() + 1);
 
   if (moneyHabit?.habitFrequency === 'Diário' && moneyLastCheck > 0) {
     removeCheckHabit({
@@ -100,7 +94,8 @@ const removeCheck = (mindHabit, moneyHabit, bodyHabit, funHabit) => {
     });
   }
   const BodyLastCheck =
-    date.getDate() - (new Date(bodyHabit?.lastCheck).getDate() + 1);
+    date.getDate().valueOf() -
+    (new Date(parseInt(bodyHabit?.lastCheck || '0')).getDate().valueOf() + 1);
 
   if (bodyHabit?.habitFrequency === 'Diário' && BodyLastCheck > 0) {
     removeCheckHabit({
@@ -121,7 +116,8 @@ const removeCheck = (mindHabit, moneyHabit, bodyHabit, funHabit) => {
     });
   }
   const FunLastCheck =
-    date.getDate() - (new Date(funHabit?.lastCheck).getDate() + 1);
+    date.getDate().valueOf() -
+    (new Date(parseInt(funHabit?.lastCheck || '0')).getDate().valueOf() + 1);
   if (funHabit?.habitFrequency === 'Diário' && FunLastCheck > 0) {
     removeCheckHabit({
       habitIsChecked: 0,
@@ -142,12 +138,18 @@ const removeCheck = (mindHabit, moneyHabit, bodyHabit, funHabit) => {
   }
 };
 
-const checkStatus = (mindHabit, moneyHabit, bodyHabit, funHabit) => {
+const checkStatus = (
+  mindHabit: CreateHabits | null | undefined,
+  moneyHabit: CreateHabits | null | undefined,
+  bodyHabit: CreateHabits | null | undefined,
+  funHabit: CreateHabits | null | undefined,
+) => {
   const date = new Date();
 
-  const mindLastCheck = date - new Date(mindHabit?.lastCheck);
+  const mindLastCheck =
+    date.valueOf() - new Date(parseInt(mindHabit?.lastCheck || '0')).valueOf();
 
-  const mindDiff = parseInt(mindLastCheck / (1000 * 3600 * 24));
+  const mindDiff = mindLastCheck / (1000 * 3600 * 24);
 
   // Verificação da mente
   if (mindHabit?.habitFrequency === 'Diário') {
@@ -207,9 +209,10 @@ const checkStatus = (mindHabit, moneyHabit, bodyHabit, funHabit) => {
 
   //Verificação do Financeiro
 
-  const moneyLastCheck = date - new Date(moneyHabit?.lastCheck);
+  const moneyLastCheck =
+    date.valueOf() - new Date(parseInt(moneyHabit?.lastCheck || '0')).valueOf();
 
-  const moneyDiff = parseInt(moneyLastCheck / (1000 * 3600 * 24));
+  const moneyDiff = moneyLastCheck / (1000 * 3600 * 24);
 
   if (moneyHabit?.habitFrequency === 'Diário') {
     if (moneyDiff === 1) {
@@ -266,9 +269,10 @@ const checkStatus = (mindHabit, moneyHabit, bodyHabit, funHabit) => {
     }
   }
   // Verificação do corpo
-  const bodyLastCheck = date - new Date(bodyHabit?.lastCheck);
+  const bodyLastCheck =
+    date.valueOf() - new Date(parseInt(bodyHabit?.lastCheck || '0')).valueOf();
 
-  const bodyDiff = parseInt(bodyLastCheck / (1000 * 3600 * 24));
+  const bodyDiff = bodyLastCheck / (1000 * 3600 * 24);
   if (bodyHabit?.habitFrequency === 'Diário') {
     if (bodyDiff === 1) {
       HabitsService.changeProgress({
@@ -325,9 +329,10 @@ const checkStatus = (mindHabit, moneyHabit, bodyHabit, funHabit) => {
     }
   }
   // Verificação da diversão
-  const funLastCheck = date - new Date(funHabit?.lastCheck);
+  const funLastCheck =
+    date.valueOf() - new Date(parseInt(funHabit?.lastCheck || '0')).valueOf();
 
-  const funDiff = parseInt(funLastCheck / (1000 * 3600 * 24));
+  const funDiff = funLastCheck / (1000 * 3600 * 24);
   if (funHabit?.habitFrequency === 'Diário') {
     if (funDiff === 1) {
       HabitsService.changeProgress({

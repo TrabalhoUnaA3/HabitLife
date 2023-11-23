@@ -42,13 +42,13 @@ export default function LifeStatus({
           style={styles.educationAnimation}
         />
         <LottieView
-          source={money}
+          source={robot}
           autoPlay
           loop
           style={styles.robotAnimation}
         />
         <LottieView
-          source={robot}
+          source={money}
           autoPlay
           loop
           style={styles.moneyAnimation}

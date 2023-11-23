@@ -9,6 +9,8 @@ import ChangeNavigationService from '../../services/ChangeNavigationService';
 import CreateHabits from '../../services/HabitsService';
 import {StackScreenProps} from '@react-navigation/stack';
 import EditHabit from '../../components/home/EditHabit';
+import CheckService from '../../services/CheckService';
+import DefaultButton from '../../components/common/DefaultButton';
 
 type HabitPageProps = StackScreenProps<RootStackParamList, 'Home'>;
 
@@ -18,7 +20,8 @@ export default function Home({route}: HabitPageProps) {
   const [moneyHabit, setMoneyHabit] = useState<CreateHabits | null>();
   const [bodyHabit, setBodyHabit] = useState<CreateHabits | null>();
   const [funHabit, setFunHabit] = useState<CreateHabits | null>();
-
+  const [checks, setChecks] = useState<number>();
+  const [gameOver, setGameOver] = useState(false);
   const [robotDaysLife, setRobotDaysLife] = useState<string>();
 
   function handleNavExplanation() {
@@ -65,24 +68,54 @@ export default function Home({route}: HabitPageProps) {
       const month = `${today.getMonth() + 1}`.padStart(2, '0');
       const day = `${today.getDate()}`.padStart(2, '0');
       const formDate = `${today.getFullYear()}-${month}-${day}`;
+      console.log('Today:', today);
+      console.log('Formatted Date:', formDate);
+      console.log('showHome.appStartData:', showHome.appStartData);
       const checkDays =
         new Date(formDate).valueOf() -
         new Date(showHome.appStartData).valueOf() +
         1;
-
+      console.log('Check Days:', checkDays);
       if (checkDays === 0) {
         setRobotDaysLife(checkDays.toString().padStart(2, '0'));
       } else {
-        setRobotDaysLife((checkDays / (1000 * 3600 * 24)).toString());
+        setRobotDaysLife(
+          parseInt(String(checkDays / (1000 * 3600 * 24))).toString(),
+        );
       }
     });
-  }, [excludeArea]);
+  }, [route.params, excludeArea]);
+
+  useEffect(() => {
+    CheckService.removeCheck(mindHabit, moneyHabit, bodyHabit, funHabit);
+    CheckService.checkStatus(mindHabit, moneyHabit, bodyHabit, funHabit);
+    const mindChecks = mindHabit ? mindHabit?.habitChecks : 0;
+    const moneyChecks = moneyHabit ? moneyHabit?.habitChecks : 0;
+    const bodyChecks = bodyHabit ? bodyHabit?.habitChecks : 0;
+    const funChecks = funHabit ? funHabit?.habitChecks : 0;
+    setChecks(mindChecks + moneyChecks + bodyChecks + funChecks);
+    if (
+      mindHabit?.progressBar === 0 ||
+      moneyHabit?.progressBar === 0 ||
+      bodyHabit?.progressBar === 0 ||
+      funHabit?.progressBar === 0
+    ) {
+      setGameOver(true);
+    }
+  }, [mindHabit, moneyHabit, bodyHabit, funHabit]);
 
   return (
     <View style={styles.container}>
       <ScrollView>
         <View style={{alignItems: 'center'}}>
-          <Text style={styles.dailyChecks}>{'❤️ 5 dias - ✔️ 0 Checks'}</Text>
+          {!gameOver ? (
+            <Text style={styles.dailyChecks}>
+              ❤️ {robotDaysLife} {robotDaysLife === '01' ? 'dia' : 'dias'} - ✔️{' '}
+              {checks} {checks === 1 ? 'Check' : 'Checks'}
+            </Text>
+          ) : (
+            <Text style={styles.gameOverTitle}>Game Over</Text>
+          )}
           <LifeStatus
             mindHabit={mindHabit}
             moneyHabit={moneyHabit}
@@ -95,44 +128,47 @@ export default function Home({route}: HabitPageProps) {
             bodyHabit={bodyHabit?.progressBar}
             funHabit={funHabit?.progressBar}
           />
-          <View>
-            {mindHabit ? (
-              <EditHabit habit={mindHabit} checkColor="#90B7F3" />
-            ) : (
-              <CreateHabit habitArea="Mente" borderColor="#90B7F3" />
-            )}
-            {moneyHabit ? (
-              <EditHabit habit={moneyHabit} checkColor="#85BB65" />
-            ) : (
-              <CreateHabit habitArea="Financeiro" borderColor="#85BB65" />
-            )}
-            {bodyHabit ? (
-              <EditHabit habit={bodyHabit} checkColor="#FF0044" />
-            ) : (
-              <CreateHabit habitArea="Corpo" borderColor="#FF0044" />
-            )}
-            {funHabit ? (
-              <EditHabit habit={funHabit} checkColor="#FE7F23" />
-            ) : (
-              <CreateHabit habitArea="Humor" borderColor="#FE7F23" />
-            )}
+          {!gameOver ? (
+            <View>
+              {mindHabit ? (
+                <EditHabit habit={mindHabit} checkColor="#90B7F3" />
+              ) : (
+                <CreateHabit habitArea="Mente" borderColor="#90B7F3" />
+              )}
+              {moneyHabit ? (
+                <EditHabit habit={moneyHabit} checkColor="#85BB65" />
+              ) : (
+                <CreateHabit habitArea="Financeiro" borderColor="#85BB65" />
+              )}
+              {bodyHabit ? (
+                <EditHabit habit={bodyHabit} checkColor="#FF0044" />
+              ) : (
+                <CreateHabit habitArea="Corpo" borderColor="#FF0044" />
+              )}
+              {funHabit ? (
+                <EditHabit habit={funHabit} checkColor="#FE7F23" />
+              ) : (
+                <CreateHabit habitArea="Humor" borderColor="#FE7F23" />
+              )}
 
-            <Text
-              style={styles.explanationText}
-              onPress={() => {
-                handleNavExplanation();
-              }}>
-              Ver explicações novamente
-            </Text>
-          </View>
-          {/* <View style={{marginVertical: 40}}>
-            <DefaultButton
-              buttonText={'Resetar o Game'}
-              handlePress={handleGameOver}
-              width={250}
-              height={50}
-            />
-          </View> */}
+              <Text
+                style={styles.explanationText}
+                onPress={() => {
+                  handleNavExplanation();
+                }}>
+                Ver explicações novamente
+              </Text>
+            </View>
+          ) : (
+            <View style={{marginVertical: 40}}>
+              <DefaultButton
+                buttonText={'Resetar o Game'}
+                handlePress={handleGameOver}
+                width={250}
+                height={50}
+              />
+            </View>
+          )}
         </View>
       </ScrollView>
     </View>

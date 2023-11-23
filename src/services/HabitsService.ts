@@ -175,7 +175,7 @@ export default class CreateHabits {
     await db?.executeSql(query, [habitArea]);
   }
 
-  static async changeProgress(obj: CreateHabits) {
+  static async changeProgress(obj: {progressBar: number; habitArea: string}) {
     const query = `UPDATE ${TABLE_NAME} SET ${PROGRESS_BAR_COLUMN}=? WHERE ${HABIT_AREA_COLUMN}=?`;
     await db?.executeSql(query, [obj.progressBar, obj.habitArea]);
   }
