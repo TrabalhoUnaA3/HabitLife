@@ -4,10 +4,10 @@ import {View, StyleSheet, Image} from 'react-native';
 import {ProgressBar} from 'react-native-paper';
 
 interface StatusBar {
-  mindHabit?: any;
-  moneyHabit?: any;
-  bodyHabit?: any;
-  funHabit?: any;
+  mindHabit: number | undefined;
+  moneyHabit: number | undefined;
+  bodyHabit: number | undefined;
+  funHabit: number | undefined;
 }
 
 export default function StatusBar({
@@ -16,6 +16,7 @@ export default function StatusBar({
   bodyHabit,
   funHabit,
 }: StatusBar) {
+  console.log(mindHabit, moneyHabit, bodyHabit, funHabit);
   return (
     <View style={styles.container}>
       <View style={styles.statusBarContainer}>

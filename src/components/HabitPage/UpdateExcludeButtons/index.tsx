@@ -1,3 +1,4 @@
+import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {
   View,
@@ -7,6 +8,8 @@ import {
   Image,
   Alert,
 } from 'react-native';
+import {StackNavigation} from '../../../../App';
+import CreateHabits from '../../../services/HabitsService';
 
 interface UpdateExcludeButtonsProps {
   habitInput: string;
@@ -14,7 +17,22 @@ interface UpdateExcludeButtonsProps {
   habitArea: string;
 }
 
-const UpdateExcludeButtons: React.FC<UpdateExcludeButtonsProps> = () => {
+const UpdateExcludeButtons = ({
+  habitInput,
+  handleUpdate,
+  habitArea,
+}: UpdateExcludeButtonsProps) => {
+  const navigation = useNavigation<StackNavigation>();
+
+  function handleDeleteHabit() {
+    CreateHabits.deleteByName(habitArea).then(() => {
+      Alert.alert('Exclusão feita com sucesso');
+      navigation.navigate('Home', {
+        excludeArea: `${habitArea}`,
+      });
+    });
+  }
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -30,7 +48,7 @@ const UpdateExcludeButtons: React.FC<UpdateExcludeButtonsProps> = () => {
               },
               {
                 text: 'Atualizar',
-                onPress: () => {},
+                onPress: handleUpdate,
               },
             ],
           );
@@ -53,7 +71,7 @@ const UpdateExcludeButtons: React.FC<UpdateExcludeButtonsProps> = () => {
               },
               {
                 text: 'Excluir',
-                onPress: () => {},
+                onPress: handleDeleteHabit,
               },
             ],
           );

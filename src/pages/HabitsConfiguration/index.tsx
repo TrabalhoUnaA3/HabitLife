@@ -23,7 +23,7 @@ export default function HabitsConfiguration() {
   const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const backToHome = () => navigation.navigate('Home');
+  const backToHome = () => navigation.goBack();
 
   const renderItem = ({item}: renderItem) => (
     <TouchableNativeFeedback

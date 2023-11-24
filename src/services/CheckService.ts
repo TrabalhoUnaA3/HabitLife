@@ -8,7 +8,12 @@ enablePromise(true);
 
 const db = DatabaseManager.db;
 
-const checkHabit = (obj: CreateHabits) => {
+const checkHabit = (obj: {
+  lastCheck: string;
+  habitIsChecked: number;
+  habitChecks: number;
+  habitArea: string;
+}) => {
   return new Promise((resolve, reject) => {
     db?.transaction(tx => {
       tx.executeSql(
@@ -47,10 +52,10 @@ const removeCheck = (
   funHabit: CreateHabits | null | undefined,
 ) => {
   const date = new Date();
-
   const mindLastCheck =
     date.getDate().valueOf() -
     (new Date(parseInt(mindHabit?.lastCheck || '0')).getDate().valueOf() + 1);
+  console.log(`teste ${mindLastCheck}`);
 
   if (mindHabit?.habitFrequency === 'Diário' && mindLastCheck > 0) {
     removeCheckHabit({
@@ -93,6 +98,7 @@ const removeCheck = (
       habitArea: moneyHabit?.habitArea,
     });
   }
+
   const BodyLastCheck =
     date.getDate().valueOf() -
     (new Date(parseInt(bodyHabit?.lastCheck || '0')).getDate().valueOf() + 1);
@@ -115,6 +121,7 @@ const removeCheck = (
       habitArea: bodyHabit?.habitArea,
     });
   }
+
   const FunLastCheck =
     date.getDate().valueOf() -
     (new Date(parseInt(funHabit?.lastCheck || '0')).getDate().valueOf() + 1);
@@ -149,8 +156,7 @@ const checkStatus = (
   const mindLastCheck =
     date.valueOf() - new Date(parseInt(mindHabit?.lastCheck || '0')).valueOf();
 
-  const mindDiff = mindLastCheck / (1000 * 3600 * 24);
-
+  const mindDiff = parseInt(String(mindLastCheck / (1000 * 3600 * 24)));
   // Verificação da mente
   if (mindHabit?.habitFrequency === 'Diário') {
     if (mindDiff === 1) {
@@ -164,6 +170,7 @@ const checkStatus = (
         habitArea: mindHabit?.habitArea,
       });
     } else if (mindDiff >= 3) {
+      console.log('é aqui');
       HabitsService.changeProgress({
         progressBar: 0,
         habitArea: mindHabit?.habitArea,
@@ -212,7 +219,7 @@ const checkStatus = (
   const moneyLastCheck =
     date.valueOf() - new Date(parseInt(moneyHabit?.lastCheck || '0')).valueOf();
 
-  const moneyDiff = moneyLastCheck / (1000 * 3600 * 24);
+  const moneyDiff = parseInt(String(moneyLastCheck / (1000 * 3600 * 24)));
 
   if (moneyHabit?.habitFrequency === 'Diário') {
     if (moneyDiff === 1) {
@@ -272,7 +279,7 @@ const checkStatus = (
   const bodyLastCheck =
     date.valueOf() - new Date(parseInt(bodyHabit?.lastCheck || '0')).valueOf();
 
-  const bodyDiff = bodyLastCheck / (1000 * 3600 * 24);
+  const bodyDiff = parseInt(String(bodyLastCheck / (1000 * 3600 * 24)));
   if (bodyHabit?.habitFrequency === 'Diário') {
     if (bodyDiff === 1) {
       HabitsService.changeProgress({
@@ -332,7 +339,7 @@ const checkStatus = (
   const funLastCheck =
     date.valueOf() - new Date(parseInt(funHabit?.lastCheck || '0')).valueOf();
 
-  const funDiff = funLastCheck / (1000 * 3600 * 24);
+  const funDiff = parseInt(String(funLastCheck / (1000 * 3600 * 24)));
   if (funHabit?.habitFrequency === 'Diário') {
     if (funDiff === 1) {
       HabitsService.changeProgress({

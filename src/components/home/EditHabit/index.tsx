@@ -1,19 +1,41 @@
+import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {Text, TouchableOpacity, StyleSheet, View, Image} from 'react-native';
+import {StackNavigation} from '../../../../App';
+import CreateHabits from '../../../services/HabitsService';
+import CheckService from '../../../services/CheckService';
 
 interface EditHabit {
-  habit?: any;
-  checkColor?: any;
+  habit: CreateHabits;
+  checkColor: string;
 }
 
 export default function EditHabit({habit, checkColor}: EditHabit) {
-  const [habitCheck, setHabitCheck] = useState<number | boolean>();
+  const navigation = useNavigation<StackNavigation>();
+  const [habitCheck, setHabitCheck] = useState<number>();
   const [checkImage, setCheckImage] = useState(
     require('../../../assets/icons/Mind.png'),
   );
+  const checkData = new Date();
+  const formatDate = `${checkData.getFullYear()}-${checkData.getMonth()}-${checkData.getDate()}`;
 
-  const handleEdit = () => {};
-  const handleCheck = () => {};
+  const handleEdit = () => {
+    navigation.navigate('HabitPage', {
+      create: false,
+      habit,
+    });
+  };
+  const handleCheck = () => {
+    if (habitCheck === 0) {
+      CheckService.checkHabit({
+        lastCheck: formatDate,
+        habitIsChecked: 1,
+        habitChecks: habit?.habitChecks + 1,
+        habitArea: habit?.habitArea,
+      });
+      setHabitCheck(1);
+    }
+  };
 
   useEffect(() => {
     setHabitCheck(habit?.habitIsChecked);

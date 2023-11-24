@@ -11,15 +11,17 @@ import {StackScreenProps} from '@react-navigation/stack';
 import EditHabit from '../../components/home/EditHabit';
 import CheckService from '../../services/CheckService';
 import DefaultButton from '../../components/common/DefaultButton';
+import DatabaseManager from '../../db';
 
 type HabitPageProps = StackScreenProps<RootStackParamList, 'Home'>;
 
 export default function Home({route}: HabitPageProps) {
   const navigation = useNavigation<StackNavigation>();
-  const [mindHabit, setMindHabit] = useState<CreateHabits | null>();
-  const [moneyHabit, setMoneyHabit] = useState<CreateHabits | null>();
-  const [bodyHabit, setBodyHabit] = useState<CreateHabits | null>();
-  const [funHabit, setFunHabit] = useState<CreateHabits | null>();
+  const [key, setKey] = useState(0);
+  const [mindHabit, setMindHabit] = useState<CreateHabits | null>(null);
+  const [moneyHabit, setMoneyHabit] = useState<CreateHabits | null>(null);
+  const [bodyHabit, setBodyHabit] = useState<CreateHabits | null>(null);
+  const [funHabit, setFunHabit] = useState<CreateHabits | null>(null);
   const [checks, setChecks] = useState<number>();
   const [gameOver, setGameOver] = useState(false);
   const [robotDaysLife, setRobotDaysLife] = useState<string>();
@@ -27,13 +29,22 @@ export default function Home({route}: HabitPageProps) {
   function handleNavExplanation() {
     navigation.navigate('AppExplanation');
   }
-  function handleGameOver() {
-    navigation.navigate('Start');
+  async function handleGameOver() {
+    await DatabaseManager.executeTransaction(tx => {
+      tx.executeSql('DROP TABLE IF EXISTS Habits');
+      tx.executeSql('DROP TABLE IF EXISTS change_navigation');
+      tx.executeSql('DROP TABLE IF EXISTS create_habits');
+    }).then(() => {
+      navigation.navigate('Start');
+      DatabaseManager.resetTablesCreated();
+      setKey(prevKey => prevKey + 1);
+    });
   }
 
   const excludeArea = route.params?.excludeArea;
 
   useEffect(() => {
+    setGameOver(false);
     const today = new Date();
 
     CreateHabits.findByArea('Mente').then(mind => {
@@ -68,14 +79,10 @@ export default function Home({route}: HabitPageProps) {
       const month = `${today.getMonth() + 1}`.padStart(2, '0');
       const day = `${today.getDate()}`.padStart(2, '0');
       const formDate = `${today.getFullYear()}-${month}-${day}`;
-      console.log('Today:', today);
-      console.log('Formatted Date:', formDate);
-      console.log('showHome.appStartData:', showHome.appStartData);
       const checkDays =
         new Date(formDate).valueOf() -
         new Date(showHome.appStartData).valueOf() +
         1;
-      console.log('Check Days:', checkDays);
       if (checkDays === 0) {
         setRobotDaysLife(checkDays.toString().padStart(2, '0'));
       } else {
@@ -103,9 +110,10 @@ export default function Home({route}: HabitPageProps) {
       setGameOver(true);
     }
   }, [mindHabit, moneyHabit, bodyHabit, funHabit]);
+  console.log(`mindHabit ${mindHabit?.progressBar}`);
 
   return (
-    <View style={styles.container}>
+    <View key={key} style={styles.container}>
       <ScrollView>
         <View style={{alignItems: 'center'}}>
           {!gameOver ? (

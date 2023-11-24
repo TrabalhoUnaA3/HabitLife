@@ -141,7 +141,14 @@ export default class CreateHabits {
 
     return habits;
   }
-  static updateHabit = (obj: CreateHabits): Promise<any> => {
+  static updateHabit = (obj: {
+    habitName: string;
+    habitFrequency: string;
+    habitHasNotification: boolean;
+    habitNotificationFrequency: string;
+    habitNotificationTime: string;
+    habitArea: string;
+  }): Promise<any> => {
     return new Promise((resolve, reject) => {
       db?.transaction(tx => {
         tx.executeSql(

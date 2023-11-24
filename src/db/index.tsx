@@ -3,9 +3,9 @@ import {
   Transaction,
   openDatabase,
 } from 'react-native-sqlite-storage';
-import { habitQuery } from './HabiDatabase';
-import { navigationQuery } from '../services/ChangeNavigationService';
-import { createHabitsTable } from '../services/HabitsService';
+import {habitQuery} from './HabiDatabase';
+import {navigationQuery} from '../services/ChangeNavigationService';
+import {createHabitsTable} from '../services/HabitsService';
 
 class DatabaseManager {
   public db: SQLiteDatabase | null = null;
@@ -28,7 +28,7 @@ class DatabaseManager {
     );
   }
 
-  private executeTransaction(
+  public executeTransaction(
     transactionCallback: (tx: Transaction) => void,
   ): Promise<void> {
     if (!this.db) {
@@ -64,20 +64,24 @@ class DatabaseManager {
       );
     });
   }
+  private tablesCreated = false;
+
+  public resetTablesCreated() {
+    this.tablesCreated = false;
+  }
 
   private createTables() {
     const createTableQueries = [navigationQuery, habitQuery, createHabitsTable];
-    let tablesCreated = false;
 
     this.executeTransaction(tx => {
-      if (!tablesCreated) {
+      if (!this.tablesCreated) {
         createTableQueries.forEach(query => {
           tx.executeSql(query);
         });
       }
     })
       .then(() => {
-        tablesCreated = true;
+        this.tablesCreated = true;
       })
       .catch(error => console.error('Error creating tables: ', error));
   }

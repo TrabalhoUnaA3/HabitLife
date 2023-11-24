@@ -73,10 +73,8 @@ export default function HabitPage({route}: HabitPageProps) {
   const {create, habit} = route.params;
 
   function handleCreateHabit() {
-    if (habitInput === undefined || frequencyInput === undefined) {
-      Alert.alert(
-        'Você precisa selecionar um hábito e frequência para continuar',
-      );
+    if (habitInput === '') {
+      Alert.alert('Você precisa selecionar um hábito para continuar');
     } else if (
       notificationToggle === true &&
       frequencyInput === 'Diário' &&
@@ -114,6 +112,26 @@ export default function HabitPage({route}: HabitPageProps) {
     }
   }
 
+  function handleUpdateHabit() {
+    if (notificationToggle === true && !dayNotification && !timeNotification) {
+      Alert.alert('Você precisa colocar a frequência e horário da notificação');
+    } else {
+      CreateHabits.updateHabit({
+        habitArea: habit?.habitArea,
+        habitName: habitInput,
+        habitFrequency: frequencyInput,
+        habitHasNotification: notificationToggle,
+        habitNotificationFrequency: dayNotification,
+        habitNotificationTime: timeNotification,
+      }).then(() => {
+        Alert.alert('Sucesso na atualização do hábito');
+      });
+      navigation.navigate('Home', {
+        updateHabit: `Updated in ${habit?.habitArea}`,
+      });
+    }
+  }
+
   function openHabitsConfiguration() {
     navigation.navigate('HabitsConfiguration');
   }
@@ -132,7 +150,7 @@ export default function HabitPage({route}: HabitPageProps) {
           <View style={styles.header}>
             <TouchableOpacity
               style={styles.backPageBtn}
-              onPress={handleCreateHabit}>
+              onPress={() => navigation.goBack()}>
               <Image
                 source={require('../../assets/icons/arrowBack.png')}
                 style={styles.arrowBack}
@@ -194,7 +212,7 @@ export default function HabitPage({route}: HabitPageProps) {
 
             {create === false ? (
               <UpdateExcludeButtons
-                handleUpdate={() => {}}
+                handleUpdate={handleUpdateHabit}
                 habitArea={habit.habitArea}
                 habitInput={'A'}
               />
