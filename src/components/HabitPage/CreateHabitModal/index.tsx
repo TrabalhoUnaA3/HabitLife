@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 22,
-    backgroundColor: '#18181870',
+    backgroundColor: '#10101090',
   },
   textStyle: {
     color: 'white',

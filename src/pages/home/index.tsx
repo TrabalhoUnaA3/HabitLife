@@ -110,7 +110,6 @@ export default function Home({route}: HabitPageProps) {
       setGameOver(true);
     }
   }, [mindHabit, moneyHabit, bodyHabit, funHabit]);
-  console.log(`mindHabit ${mindHabit?.progressBar}`);
 
   return (
     <View key={key} style={styles.container}>

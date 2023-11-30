@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Modal,
   StyleSheet,
@@ -27,6 +27,7 @@ const ConfigurationModal = ({
   habit,
 }: ModalProps) => {
   const toggleModal = () => {
+    resetModalState();
     setModalVisible(previousState => !previousState);
   };
   const [disable, setDisable] = useState(false);
@@ -49,6 +50,15 @@ const ConfigurationModal = ({
 
     return `${day}/${month}/${year} - ${hours}:${minutes}:${seconds}`;
   }
+
+  const resetModalState = () => {
+    setDisable(false);
+    setEditable(false);
+    setTitle(habit.title);
+    setDescription(habit.description);
+  };
+
+  useEffect(resetModalState, [modalVisible, habit]);
 
   const styledModal = styledModalView(getHabitColor(habit.habitType));
 
@@ -169,18 +179,22 @@ const ConfigurationModal = ({
                   <View style={styles.inputColumn}>
                     <Text style={styles.label}>Título:</Text>
                     <TextInput
-                      style={styles.input}
+                      style={[editable ? styles.input : styles.inputUnEditable]}
                       value={title}
+                      scrollEnabled={true}
                       editable={editable}
+                      numberOfLines={1}
                       onChangeText={setTitle}
                     />
                   </View>
                   <View style={styles.inputColumn}>
                     <Text style={styles.label}>Descrição:</Text>
                     <TextInput
-                      style={styles.input}
+                      style={[editable ? styles.input : styles.inputUnEditable]}
                       value={description}
+                      scrollEnabled={true}
                       editable={editable}
+                      numberOfLines={1}
                       onChangeText={setDescription}
                     />
                   </View>
@@ -256,7 +270,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 22,
-    backgroundColor: '#18181870',
+    backgroundColor: '#10101090',
   },
   modalText: {
     marginBottom: 45,
@@ -281,6 +295,15 @@ const styles = StyleSheet.create({
     height: 40,
     maxWidth: 250,
     borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 8,
+    color: 'white',
+  },
+  inputUnEditable: {
+    height: 40,
+    maxWidth: 250,
+    borderColor: '#ff5733',
     borderWidth: 1,
     borderRadius: 8,
     padding: 8,

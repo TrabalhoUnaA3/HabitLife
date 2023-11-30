@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   FlatList,
+  ScrollView,
 } from 'react-native';
 import Habit from '../../db/HabiDatabase';
 import ConfigurationModal from '../../components/HabitConfigurationPage/ConfigurationModal';
@@ -32,7 +33,11 @@ export default function HabitsConfiguration() {
         setModalVisible(true);
       }}>
       <View style={styles.panel}>
-        <Text style={styles.panelText}>{item.title}</Text>
+        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+          <Text style={styles.panelText} numberOfLines={1}>
+            {item.title}
+          </Text>
+        </ScrollView>
         <Image
           style={styles.panelImage}
           source={require('../../assets/icons/menu.png')}
@@ -126,11 +131,13 @@ const styles = StyleSheet.create({
   panelImage: {
     width: 30,
     height: 30,
+    marginStart: 10,
   },
   panelText: {
     color: 'rgba(21, 21, 21, 0.98)',
     fontSize: 25,
     fontWeight: 'bold',
     textTransform: 'capitalize',
+    overflow: 'scroll',
   },
 });

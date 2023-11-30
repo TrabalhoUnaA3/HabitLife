@@ -153,10 +153,22 @@ const checkStatus = (
 ) => {
   const date = new Date();
 
+  if (
+    mindHabit == null ||
+    mindHabit === undefined ||
+    moneyHabit == null ||
+    moneyHabit === undefined ||
+    bodyHabit == null ||
+    bodyHabit === undefined ||
+    funHabit == null ||
+    funHabit === undefined
+  ) {
+    return;
+  }
   const mindLastCheck =
-    date.valueOf() - new Date(parseInt(mindHabit?.lastCheck || '0')).valueOf();
+    date.valueOf() - new Date(mindHabit.lastCheck).valueOf();
 
-  const mindDiff = parseInt(String(mindLastCheck / (1000 * 3600 * 24)));
+  const mindDiff = mindLastCheck / (1000 * 3600 * 24);
   // Verificação da mente
   if (mindHabit?.habitFrequency === 'Diário') {
     if (mindDiff === 1) {
